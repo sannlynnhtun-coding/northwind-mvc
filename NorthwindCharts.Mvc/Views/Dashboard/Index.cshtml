@@ -1,0 +1,121 @@
+﻿@{
+    ViewData["Title"] = "Sales Dashboard";
+}
+
+<h1 class="mb-4">Sales Dashboard</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Top 5 Best-Selling Products (ApexCharts)
+            </div>
+            <div class="card-body">
+                <div id="apexPieChart"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Top 5 Best-Selling Products (HighCharts)
+            </div>
+            <div class="card-body">
+                <figure class="highcharts-figure">
+                    <div id="highchartsPieChart"></div>
+                    <p class="highcharts-description" style="text-align: center; font-size: 0.8em; margin-top: 1em;">
+                        This chart shows a comparison of the top 5 products based on quantity sold.
+                    </p>
+                </figure>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // ကျွန်တော်တို့ရဲ့ controller endpoint ကနေ Data ကို သွားယူပါမယ်။
+            $.ajax({
+                url: "/dashboard/getbestsellingproducts",
+                type: "get",
+                success: function (data) {
+                    renderApexChart(data);
+                    renderHighCharts(data);
+                },
+                error: function (xhr) {
+                    console.error("failed to load chart data:", xhr.responseText);
+                }
+            });
+        });
+
+        function renderApexChart(data) {
+            // Data ကို ApexCharts format ဖြစ်အောင် ပြောင်းပါမယ်။
+            const chartLabels = data.map(item => item.productName);
+            const chartSeries = data.map(item => item.totalQuantity);
+
+            const options = {
+              series: chartSeries,
+              chart: {
+                width: 380,
+                type: 'pie',
+              },
+              labels: chartLabels,
+              responsive: [{
+                breakpoint: 480,
+                options: {
+                  chart: {
+                    width: 200
+                  },
+                  legend: {
+                    position: 'bottom'
+                  }
+                }
+              }]
+            };
+
+            const chart = new ApexCharts(document.querySelector("#apexPieChart"), options);
+            chart.render();
+        }
+
+        function renderHighCharts(data) {
+            // Data ကို HighCharts format ဖြစ်အောင် ပြောင်းပါမယ်။
+            const chartSeries = data.map((item, index) => ({
+                name: item.productName,
+                y: item.totalQuantity,
+                // Make the first slice selected and popped out
+                sliced: index === 0,
+                selected: index === 0
+            }));
+
+            Highcharts.chart('highchartsPieChart', {
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Top 5 Best Sellers'
+                },
+                tooltip: {
+                    pointFormat: '<b>{point.y}</b> units sold'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: 'Quantity',
+                        colorByPoint: true,
+                        data: chartSeries
+                    }
+                ]
+            });
+        }
+    </script>
+}

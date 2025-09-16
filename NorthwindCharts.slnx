@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="NorthwindCharts.Database/NorthwindCharts.Database.csproj" />
+  <Project Path="NorthwindCharts.Mvc/NorthwindCharts.Mvc.csproj" />
+</Solution>
