@@ -1,0 +1,18 @@
+﻿@model CategoryFormVm
+@{
+    ViewData["Title"] = "Edit Category";
+    var routeId = ViewContext.RouteData.Values["id"];
+}
+
+<h2>Edit Category</h2>
+
+<form asp-action="Edit" asp-route-id="@routeId" method="post">
+    @Html.AntiForgeryToken()
+    <partial name="_CategoryForm" model="Model" />
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

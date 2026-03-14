@@ -1,0 +1,18 @@
+﻿@model ProductDeleteVm
+@{
+    ViewData["Title"] = "Archive Product";
+}
+
+<h2>Archive Product</h2>
+<p>This action marks the product as discontinued (safe archive).</p>
+
+<div class="alert alert-warning">
+    <strong>@Model.ProductName</strong>
+    <div>Current status: @(Model.Discontinued ? "Discontinued" : "Active")</div>
+</div>
+
+<form asp-action="Delete" asp-route-id="@Model.ProductId" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger">Archive</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+</form>

@@ -2,7 +2,8 @@
 {
     public class BestSellingProductDto
     {
-        public string ProductName { get; set; }
+        public required string ProductName { get; set; }
+
         public int TotalQuantity { get; set; }
     }
 }

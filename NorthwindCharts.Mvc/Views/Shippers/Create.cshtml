@@ -1,0 +1,16 @@
+﻿@model ShipperFormVm
+@{
+    ViewData["Title"] = "Create Shipper";
+}
+
+<h2>Create Shipper</h2>
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <partial name="_ShipperForm" model="Model" />
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

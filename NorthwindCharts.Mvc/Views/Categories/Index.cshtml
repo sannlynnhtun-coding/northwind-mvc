@@ -1,0 +1,46 @@
+﻿@model CategoryIndexVm
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Categories</h2>
+    <a class="btn btn-primary" asp-action="Create">Create Category</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input class="form-control" type="text" name="search" value="@Model.Pagination.Search" placeholder="Search categories" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+    </div>
+</form>
+
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Products</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Items)
+    {
+        <tr>
+            <td>@item.CategoryName</td>
+            <td>@item.Description</td>
+            <td>@item.ProductCount</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.CategoryId">Details</a> |
+                <a asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<partial name="_Pager" model="Model.Pagination" />

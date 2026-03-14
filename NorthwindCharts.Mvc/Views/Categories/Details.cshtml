@@ -1,0 +1,14 @@
+﻿@model CategoryDetailsVm
+@{
+    ViewData["Title"] = "Category Details";
+}
+
+<h2>Category Details</h2>
+<dl class="row">
+    <dt class="col-sm-3">Name</dt><dd class="col-sm-9">@Model.CategoryName</dd>
+    <dt class="col-sm-3">Description</dt><dd class="col-sm-9">@Model.Description</dd>
+    <dt class="col-sm-3">Products</dt><dd class="col-sm-9">@Model.ProductCount</dd>
+</dl>
+
+<a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.CategoryId">Edit</a>
+<a class="btn btn-secondary" asp-action="Index">Back</a>

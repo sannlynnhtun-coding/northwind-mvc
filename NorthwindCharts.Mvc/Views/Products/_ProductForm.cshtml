@@ -1,0 +1,53 @@
+﻿@model ProductFormPageVm
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <label asp-for="Form.ProductName" class="form-label"></label>
+        <input asp-for="Form.ProductName" class="form-control" />
+        <span asp-validation-for="Form.ProductName" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Form.CategoryId" class="form-label"></label>
+        <select asp-for="Form.CategoryId" class="form-select" asp-items="@(new SelectList(Model.CategoryOptions, "Id", "Name"))">
+            <option value="">(none)</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Form.SupplierId" class="form-label"></label>
+        <select asp-for="Form.SupplierId" class="form-select" asp-items="@(new SelectList(Model.SupplierOptions, "Id", "Name"))">
+            <option value="">(none)</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Form.UnitPrice" class="form-label"></label>
+        <input asp-for="Form.UnitPrice" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Form.UnitsInStock" class="form-label"></label>
+        <input asp-for="Form.UnitsInStock" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Form.UnitsOnOrder" class="form-label"></label>
+        <input asp-for="Form.UnitsOnOrder" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Form.ReorderLevel" class="form-label"></label>
+        <input asp-for="Form.ReorderLevel" class="form-control" />
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Form.QuantityPerUnit" class="form-label"></label>
+        <input asp-for="Form.QuantityPerUnit" class="form-control" />
+    </div>
+
+    <div class="col-md-6 d-flex align-items-end">
+        <div class="form-check">
+            <input asp-for="Form.Discontinued" class="form-check-input" />
+            <label asp-for="Form.Discontinued" class="form-check-label"></label>
+        </div>
+    </div>
+</div>

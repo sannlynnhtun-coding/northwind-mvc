@@ -1,47 +1,50 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NorthwindCharts.Database.AppDbContextModels;
-using NorthwindCharts.Mvc.Dtos;
+using NorthwindCharts.Mvc.Services.Abstractions;
+using NorthwindCharts.Mvc.ViewModels.Dashboard;
 
-namespace NorthwindCharts.Mvc.Controllers
+namespace NorthwindCharts.Mvc.Controllers;
+
+[Route("dashboard")]
+public sealed class DashboardController : Controller
 {
-    public class DashboardController : Controller
+    private readonly IDashboardReportService _reportService;
+
+    public DashboardController(IDashboardReportService reportService)
     {
-        private readonly AppDbContext _db;
+        _reportService = reportService;
+    }
 
-        public DashboardController(AppDbContext db)
-        {
-            _db = db;
-        }
+    [HttpGet("")]
+    public IActionResult Index([FromQuery] int year = 1997, [FromQuery] int topN = 5)
+    {
+        return View(new DashboardIndexVm { Year = year, TopN = topN });
+    }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+    [HttpGet("api/top-products")]
+    public async Task<IActionResult> TopProducts([FromQuery] int topN = 5, CancellationToken cancellationToken = default)
+    {
+        var data = await _reportService.GetTopProductsAsync(topN, cancellationToken);
+        return Ok(data);
+    }
 
-        [HttpGet]
-        public async Task<IActionResult> GetBestSellingProducts()
-        {
-            // ရောင်းရအရေအတွက်အလိုက် အရောင်းရဆုံး product ၅ ခုကို ဆွဲထုတ်မယ့် Raw SQL Query ပါ။
-            var sqlQuery = @"
-                SELECT TOP 5
-                    P.ProductName,
-                    SUM(OD.Quantity) AS TotalQuantity
-                FROM
-                    [Order Details] OD
-                JOIN
-                    Products P ON OD.ProductID = P.ProductID
-                GROUP BY
-                    P.ProductName
-                ORDER BY
-                    TotalQuantity DESC";
+    [HttpGet("api/monthly-sales")]
+    public async Task<IActionResult> MonthlySales([FromQuery] int year = 1997, CancellationToken cancellationToken = default)
+    {
+        var data = await _reportService.GetMonthlySalesAsync(year, cancellationToken);
+        return Ok(data);
+    }
 
-            // FromSqlRaw ကိုသုံးပြီး Query ကရလာတဲ့ Data တွေကို ကျွန်တော်တို့ရဲ့ DTO ထဲကို ထည့်ပါမယ်။
-            var topProducts = await _db.Database
-                                       .SqlQueryRaw<BestSellingProductDto>(sqlQuery)
-                                       .ToListAsync();
+    [HttpGet("api/sales-by-category")]
+    public async Task<IActionResult> SalesByCategory([FromQuery] int year = 1997, [FromQuery] int topN = 8, CancellationToken cancellationToken = default)
+    {
+        var data = await _reportService.GetSalesByCategoryAsync(year, topN, cancellationToken);
+        return Ok(data);
+    }
 
-            return Json(topProducts);
-        }
+    [HttpGet("api/orders-by-country")]
+    public async Task<IActionResult> OrdersByCountry([FromQuery] int year = 1997, [FromQuery] int topN = 10, CancellationToken cancellationToken = default)
+    {
+        var data = await _reportService.GetOrdersByCountryAsync(year, topN, cancellationToken);
+        return Ok(data);
     }
 }

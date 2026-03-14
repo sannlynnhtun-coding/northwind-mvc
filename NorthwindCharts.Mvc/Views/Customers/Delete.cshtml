@@ -1,0 +1,18 @@
+﻿@model CustomerDetailsVm
+@{
+    ViewData["Title"] = "Delete Customer";
+}
+
+<h2>Delete Customer</h2>
+<p class="text-danger">Deletion is blocked when orders reference this customer.</p>
+
+<div class="alert alert-warning">
+    <strong>@Model.CompanyName (@Model.CustomerId)</strong>
+    <div>Recent orders: @Model.RecentOrders.Count</div>
+</div>
+
+<form asp-action="Delete" asp-route-id="@Model.CustomerId" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+</form>

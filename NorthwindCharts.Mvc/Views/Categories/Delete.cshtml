@@ -1,0 +1,18 @@
+﻿@model CategoryDetailsVm
+@{
+    ViewData["Title"] = "Delete Category";
+}
+
+<h2>Delete Category</h2>
+<p class="text-danger">Deletion is blocked when products reference this category.</p>
+
+<div class="alert alert-warning">
+    <strong>@Model.CategoryName</strong>
+    <div>Referenced products: @Model.ProductCount</div>
+</div>
+
+<form asp-action="Delete" asp-route-id="@Model.CategoryId" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+</form>

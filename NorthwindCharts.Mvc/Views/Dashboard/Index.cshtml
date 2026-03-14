@@ -1,121 +1,122 @@
-﻿@{
+﻿@model DashboardIndexVm
+@{
     ViewData["Title"] = "Sales Dashboard";
 }
 
-<h1 class="mb-4">Sales Dashboard</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Sales Dashboard</h2>
+    <form class="row row-cols-lg-auto g-2" method="get" asp-controller="Dashboard" asp-action="Index">
+        <div class="col-12">
+            <input type="number" class="form-control" name="year" value="@Model.Year" min="1990" max="2100" />
+        </div>
+        <div class="col-12">
+            <input type="number" class="form-control" name="topN" value="@Model.TopN" min="1" max="25" />
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Apply</button>
+        </div>
+    </form>
+</div>
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                Top 5 Best-Selling Products (ApexCharts)
-            </div>
-            <div class="card-body">
-                <div id="apexPieChart"></div>
-            </div>
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">Top Products (Quantity)</div>
+            <div class="card-body"><div id="topProductsChart"></div></div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                Top 5 Best-Selling Products (HighCharts)
-            </div>
-            <div class="card-body">
-                <figure class="highcharts-figure">
-                    <div id="highchartsPieChart"></div>
-                    <p class="highcharts-description" style="text-align: center; font-size: 0.8em; margin-top: 1em;">
-                        This chart shows a comparison of the top 5 products based on quantity sold.
-                    </p>
-                </figure>
-            </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">Monthly Sales</div>
+            <div class="card-body"><div id="monthlySalesChart"></div></div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">Sales by Category</div>
+            <div class="card-body"><div id="categorySalesChart"></div></div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">Orders by Country</div>
+            <div class="card-body"><div id="countryOrdersChart"></div></div>
         </div>
     </div>
 </div>
 
 @section scripts {
-    <script>
-        $(document).ready(function () {
-            // ကျွန်တော်တို့ရဲ့ controller endpoint ကနေ Data ကို သွားယူပါမယ်။
-            $.ajax({
-                url: "/dashboard/getbestsellingproducts",
-                type: "get",
-                success: function (data) {
-                    renderApexChart(data);
-                    renderHighCharts(data);
-                },
-                error: function (xhr) {
-                    console.error("failed to load chart data:", xhr.responseText);
-                }
-            });
+<script>
+    const year = @Model.Year;
+    const topN = @Model.TopN;
+
+    async function loadJson(url) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to load ${url}`);
+        }
+        return await response.json();
+    }
+
+    async function renderDashboard() {
+        try {
+            const [topProducts, monthlySales, categorySales, countryOrders] = await Promise.all([
+                loadJson(`/dashboard/api/top-products?topN=${topN}`),
+                loadJson(`/dashboard/api/monthly-sales?year=${year}`),
+                loadJson(`/dashboard/api/sales-by-category?year=${year}&topN=${topN}`),
+                loadJson(`/dashboard/api/orders-by-country?year=${year}&topN=${topN}`)
+            ]);
+
+            renderTopProducts(topProducts);
+            renderMonthlySales(monthlySales);
+            renderCategorySales(categorySales);
+            renderCountryOrders(countryOrders);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function renderTopProducts(data) {
+        const labels = data.map(x => x.productName);
+        const series = data.map(x => x.totalQuantity);
+
+        const chart = new ApexCharts(document.querySelector("#topProductsChart"), {
+            chart: { type: 'pie', height: 320 },
+            labels,
+            series
         });
+        chart.render();
+    }
 
-        function renderApexChart(data) {
-            // Data ကို ApexCharts format ဖြစ်အောင် ပြောင်းပါမယ်။
-            const chartLabels = data.map(item => item.productName);
-            const chartSeries = data.map(item => item.totalQuantity);
+    function renderMonthlySales(data) {
+        Highcharts.chart('monthlySalesChart', {
+            title: { text: `Monthly Sales (${year})` },
+            xAxis: { categories: data.map(x => `M${x.salesMonth}`) },
+            yAxis: { title: { text: 'Sales Amount' } },
+            series: [{ name: 'Sales', data: data.map(x => x.totalSales) }]
+        });
+    }
 
-            const options = {
-              series: chartSeries,
-              chart: {
-                width: 380,
-                type: 'pie',
-              },
-              labels: chartLabels,
-              responsive: [{
-                breakpoint: 480,
-                options: {
-                  chart: {
-                    width: 200
-                  },
-                  legend: {
-                    position: 'bottom'
-                  }
-                }
-              }]
-            };
+    function renderCategorySales(data) {
+        Highcharts.chart('categorySalesChart', {
+            chart: { type: 'column' },
+            title: { text: `Top ${topN} Categories` },
+            xAxis: { categories: data.map(x => x.categoryName) },
+            yAxis: { title: { text: 'Sales Amount' } },
+            series: [{ name: 'Sales', data: data.map(x => x.totalSales) }]
+        });
+    }
 
-            const chart = new ApexCharts(document.querySelector("#apexPieChart"), options);
-            chart.render();
-        }
+    function renderCountryOrders(data) {
+        Highcharts.chart('countryOrdersChart', {
+            chart: { type: 'bar' },
+            title: { text: `Top ${topN} Countries by Orders` },
+            xAxis: { categories: data.map(x => x.shipCountry) },
+            yAxis: { title: { text: 'Orders' } },
+            series: [{ name: 'Orders', data: data.map(x => x.totalOrders) }]
+        });
+    }
 
-        function renderHighCharts(data) {
-            // Data ကို HighCharts format ဖြစ်အောင် ပြောင်းပါမယ်။
-            const chartSeries = data.map((item, index) => ({
-                name: item.productName,
-                y: item.totalQuantity,
-                // Make the first slice selected and popped out
-                sliced: index === 0,
-                selected: index === 0
-            }));
-
-            Highcharts.chart('highchartsPieChart', {
-                chart: {
-                    type: 'pie'
-                },
-                title: {
-                    text: 'Top 5 Best Sellers'
-                },
-                tooltip: {
-                    pointFormat: '<b>{point.y}</b> units sold'
-                },
-                plotOptions: {
-                    pie: {
-                        allowPointSelect: true,
-                        cursor: 'pointer',
-                        dataLabels: {
-                            enabled: true,
-                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                        }
-                    }
-                },
-                series: [
-                    {
-                        name: 'Quantity',
-                        colorByPoint: true,
-                        data: chartSeries
-                    }
-                ]
-            });
-        }
-    </script>
+    document.addEventListener('DOMContentLoaded', renderDashboard);
+</script>
 }

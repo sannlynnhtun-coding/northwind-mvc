@@ -1,0 +1,46 @@
+﻿@model ShipperIndexVm
+@{
+    ViewData["Title"] = "Shippers";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Shippers</h2>
+    <a class="btn btn-primary" asp-action="Create">Create Shipper</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input class="form-control" type="text" name="search" value="@Model.Pagination.Search" placeholder="Search shippers" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+    </div>
+</form>
+
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Phone</th>
+            <th>Orders</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Items)
+    {
+        <tr>
+            <td>@item.CompanyName</td>
+            <td>@item.Phone</td>
+            <td>@item.OrderCount</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.ShipperId">Details</a> |
+                <a asp-action="Edit" asp-route-id="@item.ShipperId">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@item.ShipperId">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<partial name="_Pager" model="Model.Pagination" />

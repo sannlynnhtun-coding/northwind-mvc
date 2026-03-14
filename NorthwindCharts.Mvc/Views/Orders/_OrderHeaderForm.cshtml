@@ -1,0 +1,37 @@
+﻿@model OrderFormPageVm
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <label asp-for="Form.CustomerId" class="form-label"></label>
+        <select asp-for="Form.CustomerId" class="form-select" asp-items="@(new SelectList(Model.Customers, "Id", "Name"))"></select>
+        <span asp-validation-for="Form.CustomerId" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Form.ShipVia" class="form-label"></label>
+        <select asp-for="Form.ShipVia" class="form-select" asp-items="@(new SelectList(Model.Shippers, "Id", "Name"))">
+            <option value="">(none)</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Form.RequiredDate" class="form-label"></label>
+        <input asp-for="Form.RequiredDate" type="date" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Form.Freight" class="form-label"></label>
+        <input asp-for="Form.Freight" class="form-control" />
+    </div>
+    <div class="col-md-9">
+        <label asp-for="Form.ShipName" class="form-label"></label>
+        <input asp-for="Form.ShipName" class="form-control" />
+    </div>
+
+    <div class="col-md-12"><label asp-for="Form.ShipAddress" class="form-label"></label><input asp-for="Form.ShipAddress" class="form-control" /></div>
+    <div class="col-md-3"><label asp-for="Form.ShipCity" class="form-label"></label><input asp-for="Form.ShipCity" class="form-control" /></div>
+    <div class="col-md-3"><label asp-for="Form.ShipRegion" class="form-label"></label><input asp-for="Form.ShipRegion" class="form-control" /></div>
+    <div class="col-md-3"><label asp-for="Form.ShipPostalCode" class="form-label"></label><input asp-for="Form.ShipPostalCode" class="form-control" /></div>
+    <div class="col-md-3"><label asp-for="Form.ShipCountry" class="form-label"></label><input asp-for="Form.ShipCountry" class="form-control" /></div>
+</div>
