@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="NorthwindCharts.Database/NorthwindCharts.Database.csproj" />
   <Project Path="NorthwindCharts.Mvc/NorthwindCharts.Mvc.csproj" />
+  <Project Path="NorthwindCharts.Tests/NorthwindCharts.Tests.csproj" />
 </Solution>
