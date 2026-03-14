@@ -1,0 +1,37 @@
+﻿name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+          cache: true
+
+      - name: Restore
+        run: dotnet restore NorthwindCharts.Tests/NorthwindCharts.Tests.csproj
+
+      - name: Build MVC
+        run: dotnet build NorthwindCharts.Mvc/NorthwindCharts.Mvc.csproj --configuration Release --no-restore
+
+      - name: Build Tests
+        run: dotnet build NorthwindCharts.Tests/NorthwindCharts.Tests.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test NorthwindCharts.Tests/NorthwindCharts.Tests.csproj --configuration Release --no-build --verbosity normal
